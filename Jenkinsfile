@@ -3,7 +3,6 @@ pipeline {
 
     tools {
         nodejs 'nodejs'  // Name must match the one in Global Tool Configuration
-        SonarQube 'SonarQube'
     }
 
     environment {
@@ -49,8 +48,17 @@ pipeline {
         // Step 4: Run SonarQube analysis on the code for quality checks
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=my-nodejs-project'
+                echo 'Running SonarQube analysis...'
+                withCredentials([string(credentialsId: SONARQUBE_TOKEN, variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=Devops_Assignment4 \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN
+                        """
+                    }
                 }
             }
         }
