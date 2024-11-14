@@ -1,7 +1,13 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs('NodeJS')
+    }
+
     environment {
+        NODEJS_HOME = tool name: 'NodeJS' // Assumes NodeJS is configured in Jenkins tools
+        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
         NEXUS_URL = 'http://localhost:8081'
         NEXUS_REPOSITORY = 'devops_assignment4'
@@ -10,6 +16,7 @@ pipeline {
         GIT_CREDENTIALS = 'github-credentials' // GitHub credentials ID in Jenkins
         APP_VERSION = '1.0.0' // Version of the application; can be set dynamically if needed
     }
+    
     
     stages {
         // Step 1: Checkout code from GitHub repository
@@ -25,7 +32,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                bat  'npm install'
+                sh  'npm install'
             }
         }
         
@@ -33,7 +40,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                bat  'npm run build' // Replace with specific build command if different
+                sh  'npm run build' // Replace with specific build command if different
             }
         }
         
