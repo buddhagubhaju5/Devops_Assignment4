@@ -4,9 +4,9 @@ pipeline {
     tools {
         nodejs 'nodejs'  // Name must match the one in Global Tool Configuration
     }
-    
+
     environment {
-        NODEJS_HOME = tool name: 'NodeJS' // Assumes NodeJS is configured in Jenkins tools
+        NODEJS_HOME = tool name: 'nodejs' // Assumes NodeJS is configured in Jenkins tools
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
         NEXUS_URL = 'http://localhost:8081'
