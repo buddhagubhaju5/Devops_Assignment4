@@ -54,6 +54,7 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
+            }
         }
         
         // Step 5: Wait for SonarQube quality gate results; aborts pipeline if gate fails
