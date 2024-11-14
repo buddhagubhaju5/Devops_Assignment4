@@ -47,15 +47,8 @@ pipeline {
         // Step 4: Run SonarQube analysis on the code for quality checks
         stage('SonarQube Analysis') {
             steps {
-                echo 'Running SonarQube analysis...'
-                withCredentials([string(credentialsId: SONARQUBE_TOKEN, variable: 'SONAR_TOKEN')]) {
-                    sh """
-                    sonar-scanner \
-                        -Dsonar.projectKey=Devops_Assignment4 \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=$SONAR_TOKEN
-                    """
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner -Dsonar.projectKey=my-nodejs-project'
                 }
             }
         }
