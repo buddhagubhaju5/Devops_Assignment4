@@ -55,6 +55,8 @@ pipeline {
                         -Dsonar.projectName="dev_assign4" \
                         -Dsonar.exclusions=**/node_modules/** \
                         -Dsonar.projectKey=dev_assign4"""
+                    }
+                }
             }
         }
         
