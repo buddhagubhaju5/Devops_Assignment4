@@ -25,7 +25,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                sh 'npm install'
+                bat  'npm install'
             }
         }
         
@@ -33,7 +33,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                sh 'npm run build' // Replace with specific build command if different
+                bat  'npm run build' // Replace with specific build command if different
             }
         }
         
