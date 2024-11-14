@@ -1,9 +1,5 @@
 pipeline {
     agent any
-    
-    tools {
-        nodejs('NodeJS')
-    }
 
     environment {
         NODEJS_HOME = tool name: 'NodeJS' // Assumes NodeJS is configured in Jenkins tools
