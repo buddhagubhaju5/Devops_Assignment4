@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         NODEJS_HOME = tool name: 'nodejs' // Assumes NodeJS is configured in Jenkins tools
+        SCANNER_HOME = tool 'SonarQubeScanner'
+
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
         SONARQUBE_SERVER = 'SonarQube'  // Name configured for SonarQube in Jenkins
@@ -46,10 +48,16 @@ pipeline {
         }
         
         // Step 4: Run SonarQube analysis on the code for quality checks
-           stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=my-nodejs-project'
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http:/0.0.0.0:9000/ \
+                        -Dsonar.token=squ_74ff488ed13a82159d6dde8f616c4d091f9341a3 \
+                        -Dsonar.projectName="devops_assignment4" \
+                        -Dsonar.exclusions=**/node_modules/** \
+                        -Dsonar.projectKey=devops_assignment4"""
+                    }
                 }
             }
         }
