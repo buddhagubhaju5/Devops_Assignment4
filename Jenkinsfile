@@ -48,11 +48,8 @@ pipeline {
         // Step 4: Run SonarQube analysis on the code for quality checks
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    def scannerHome = tool 'SonarQube'
-                    withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner -Dsonar.projectKey=my-nodejs-project'
                 }
             }
         }
