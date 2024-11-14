@@ -9,6 +9,7 @@ pipeline {
         NODEJS_HOME = tool name: 'nodejs' // Assumes NodeJS is configured in Jenkins tools
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
+        SONARQUBE_SERVER = 'SonarQube'  // Name configured for SonarQube in Jenkins
         NEXUS_URL = 'http://localhost:8081'
         NEXUS_REPOSITORY = 'devops_assignment4'
         NEXUS_CREDENTIALS = 'nexus_credentials' // Nexus credentials ID in Jenkins
