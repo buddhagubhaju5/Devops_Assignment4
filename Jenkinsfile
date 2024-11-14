@@ -1,75 +1,111 @@
 pipeline {
     agent any
-
+    
     environment {
-        NODEJS_HOME = tool name: 'NodeJS'
-        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
-        SONARQUBE_SERVER = 'SonarQube'
-        NEXUS_URL = 'http://nexus.example.com'
-        NEXUS_REPO = 'your-nexus-repository-id'
-        NEXUS_CREDENTIALS_ID = 'nexus-credentials-id'
+        GIT_REPO_URL = 'git@github.com:buddhagubhaju5/Devops_Assignment4.git'
+        NEXUS_URL = 'http://localhost:8081'
+        NEXUS_REPOSITORY = 'devops_assignment4'
+        NEXUS_CREDENTIALS = 'nexus_credentials' // Nexus credentials ID in Jenkins
+        SONARQUBE_TOKEN = 'Sonarqube-Token' // SonarQube token ID in Jenkins
+        GIT_CREDENTIALS = 'github-credentials' // GitHub credentials ID in Jenkins
+        APP_VERSION = '1.0.0' // Version of the application; can be set dynamically if needed
     }
-
+    
     stages {
+        // Step 1: Checkout code from GitHub repository
         stage('Checkout') {
             steps {
-                checkout scm
+                echo 'Cloning GitHub repository...'
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], 
+                    userRemoteConfigs: [[url: "${GIT_REPO_URL}", credentialsId: "${GIT_CREDENTIALS}"]]])
             }
         }
-
+        
+        // Step 2: Install project dependencies using npm
         stage('Install Dependencies') {
             steps {
+                echo 'Installing dependencies...'
                 sh 'npm install'
             }
         }
-
+        
+        // Step 3: Build the application (e.g., using npm or webpack)
         stage('Build') {
             steps {
-                sh 'npm run build'
+                echo 'Building the application...'
+                sh 'npm run build' // Replace with specific build command if different
             }
         }
-
+        
+        // Step 4: Run SonarQube analysis on the code for quality checks
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=my-nodejs-project'
+                echo 'Running SonarQube analysis...'
+                withCredentials([string(credentialsId: SONARQUBE_TOKEN, variable: 'SONAR_TOKEN')]) {
+                    sh """
+                    sonar-scanner \
+                        -Dsonar.projectKey=Devops_Assignment4 \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
                 }
             }
         }
-
+        
+        // Step 5: Wait for SonarQube quality gate results; aborts pipeline if gate fails
         stage('Quality Gate') {
             steps {
-                script {
-                    timeout(time: 1, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
+                echo 'Waiting for SonarQube quality gate results...'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
-
+        
+        // Step 6: Archive the built artifact in Jenkins for easy access
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'dist/**', allowEmptyArchive: true
+                echo 'Archiving the built artifact...'
+                archiveArtifacts artifacts: 'path/to/build-directory/**/*', allowEmptyArchive: true
             }
         }
-
+        
+        // Step 7: Package the application as a tar.gz file for deployment
+        stage('Package') {
+            steps {
+                echo 'Packaging the application...'
+                sh 'tar -czf myapp-${APP_VERSION}.tar.gz -C path/to/build-directory .' // Adjust the path as needed
+            }
+        }
+        
+        // Step 8: Deploy the packaged artifact to Nexus repository
         stage('Deploy to Nexus') {
             steps {
-                nexusArtifactUploader artifacts: [
-                    [artifactId: 'my-app', classifier: '', file: 'dist/my-app.zip', type: 'zip']
-                ],
-                credentialsId: "${NEXUS_CREDENTIALS_ID}",
-                groupId: 'com.example',
-                nexusUrl: "${NEXUS_URL}",
-                repository: "${NEXUS_REPO}",
-                version: '1.0.0'
+                echo 'Deploying to Nexus...'
+                nexusArtifactUploader artifacts: [[artifactId: 'myapp', 
+                                                  classifier: '', 
+                                                  file: "myapp-${APP_VERSION}.tar.gz", 
+                                                  type: 'gz']], 
+                                     credentialsId: NEXUS_CREDENTIALS, 
+                                     groupId: 'com.example', 
+                                     nexusUrl: "${NEXUS_URL}", 
+                                     nexusVersion: 'nexus3', 
+                                     protocol: 'http', 
+                                     repository: "${NEXUS_REPOSITORY}", 
+                                     version: "${APP_VERSION}"
             }
         }
     }
-
+    
     post {
+        // Cleanup step to delete the packaged artifact from Jenkins workspace
+        always {
+            echo 'Cleaning up...'
+            sh 'rm -f myapp-*.tar.gz'
+        }
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline succeeded!'
         }
         failure {
             echo 'Pipeline failed.'
