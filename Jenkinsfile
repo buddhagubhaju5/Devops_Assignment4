@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        GIT_REPO_URL = 'git@github.com:buddhagubhaju5/Devops_Assignment4.git'
+        GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
         NEXUS_URL = 'http://localhost:8081'
         NEXUS_REPOSITORY = 'devops_assignment4'
         NEXUS_CREDENTIALS = 'nexus_credentials' // Nexus credentials ID in Jenkins
