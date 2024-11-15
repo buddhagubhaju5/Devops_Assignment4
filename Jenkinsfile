@@ -104,9 +104,9 @@ pipeline {
         // Step 7: deploy to Nexus
         stage('Publish to Nexus') {
             steps {
-                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
+                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'mynpmrc')]) {
                     echo 'Publishing to Nexus...'
-                    sh "npm publish --userconfig ${npmrc} --loglevel verbose"
+                    sh "npm publish --userconfig ${mynpmrc} --loglevel verbose"
                 }
             }
         }
