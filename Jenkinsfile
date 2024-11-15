@@ -36,9 +36,7 @@ pipeline {
         // Step 2: Install project dependencies using npm
         stage('Install Dependencies') {
             steps {
-                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
-                    echo 'Building...'
-                    sh "npm install --userconfig $npmrc --registry http://172.31.208.1:8081/repository/npm-proxy/ --loglevel verbose"
+                    sh 'npm install'
                 }
             }
         }
