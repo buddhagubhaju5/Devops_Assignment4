@@ -68,38 +68,7 @@ pipeline {
                 }
             }
         }
-        
-        // Step 2: Install project dependencies using npm
-        stage('Install Dependencies') {
-            steps {
-                echo 'Installing dependencies...'
-                sh  'npm install'
-            }
-        }
-        
-        // Step 3: Build the application (e.g., using npm or webpack)
-        stage('Build') {
-            steps {
-                echo 'Building the application...'
-                sh  'npm run build' // Replace with specific build command if different
-            }
-        }
-        
-        // Step 4: Run SonarQube analysis on the code for quality checks
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv('SonarQube') {
-                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
-                        -Dsonar.token=squ_74ff488ed13a82159d6dde8f616c4d091f9341a3 \
-                        -Dsonar.projectName="devassign4" \
-                        -Dsonar.exclusions=**/node_modules/** \
-                        -Dsonar.projectKey=devassign4"""
-                    }
-                }
-            }
-        }
-        
+    
         // Step 5: Wait for SonarQube quality gate results; aborts pipeline if gate fails
         stage('Quality Gate') {
             steps {
