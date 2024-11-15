@@ -34,7 +34,7 @@
 		"dev": "nodemon src/index.ts"
 	},
 	"publishConfig": {
-		"registry": "http://172.31.208.1:8081/repository/devops-exercise4-hosted/"
+		"registry": "http://172.31.208.1:8081/repository/npm-hosted/"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.5",
