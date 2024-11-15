@@ -37,9 +37,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                     sh 'npm install'
-                }
             }
         }
+        
 
         // Step 3: Build the application (e.g., using npm or webpack)
         stage('Build') {
