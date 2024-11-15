@@ -101,7 +101,7 @@ pipeline {
             }
         }
         
-        // Step 7: Publish to nexus
+        // Step 7: deploy to Nexus
         stage('Publish to Nexus') {
             steps {
                 withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
