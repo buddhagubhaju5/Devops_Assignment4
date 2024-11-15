@@ -2,11 +2,11 @@ pipeline {
     agent any
 
    tools {
-        nodejs 'NodeJS 18.20.5'
+        nodejs 'nodejs'
     }
 
     environment {
-        SCANNER_HOME = tool 'SonarQube Scanner 6.2.1.4610'
+        SCANNER_HOME = tool 'SonarQube'
 
         NODEJS_HOME = tool name: 'NodeJS 18.20.5'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
