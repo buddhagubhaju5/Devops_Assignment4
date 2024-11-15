@@ -70,9 +70,25 @@ pipeline {
         // Step 5: Wait for SonarQube quality gate results; aborts pipeline if gate fails
         stage('Quality Gate') {
             steps {
-                echo 'Waiting for SonarQube quality gate results...'
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                script {
+                    sh '''#!/bin/bash
+                    curl http://172.17.0.1:9000/api/server/version
+                    '''
+
+
+                    sleep(time: 30, unit: 'SECONDS')
+                    def qualityGate = waitForQualityGate()
+                    if (qualityGate.status == 'IN_PROGRESS') {
+                        sleep(time: 30, unit: 'SECONDS')
+                        error "Quality Gate is in progress. Trying again..."
+                    }
+
+                    if (qualityGate.status != 'OK') {
+                        error "Quality Gate failed: ${qualityGate.status}"
+                    }
+                    else {
+                        echo "Quality Gate passed: ${qualityGate.status}"
+                    }
                 }
             }
         }
