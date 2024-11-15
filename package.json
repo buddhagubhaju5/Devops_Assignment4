@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"scripts": {
     "start": "node app.js",    
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
 	},
 	"publishConfig": {
 		"registry": "http://172.31.208.1:8081/repository/npm-hosted/"
