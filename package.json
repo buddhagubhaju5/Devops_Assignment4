@@ -18,3 +18,34 @@
     "webpack-cli": "^4.9.1"
   }
 }
+
+
+
+{
+	"name": "devops_assignment4",
+	"version": "1.0.0",
+	"main": "app.js",
+	"repository": "https://github.com/buddhagubhaju5/Devops_Assignment4.git",
+	"author": "Buddha Gubhaju",
+	"license": "MIT",
+	"scripts": {
+		"build": "npx tsc",
+    "start": "node app.js",    
+		"dev": "nodemon src/index.ts"
+	},
+	"publishConfig": {
+		"registry": "http://172.31.208.1:8081/repository/devops-exercise4-hosted/"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"express": "^4.21.1"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.9.0",
+		"concurrently": "^9.1.0",
+		"nodemon": "^3.1.7",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.6.3"
+	}
+}

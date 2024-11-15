@@ -1,25 +1,27 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'nodejs'  // Name must match the one in Global Tool Configuration
+   tools {
+        nodejs 'NodeJS 18.20.5'
     }
 
     environment {
-        NODEJS_HOME = tool name: 'nodejs' // Assumes NodeJS is configured in Jenkins tools
-        SCANNER_HOME = tool 'SonarQube'
+        SCANNER_HOME = tool 'SonarQube Scanner 6.2.1.4610'
 
+        NODEJS_HOME = tool name: 'NodeJS 18.20.5'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
+
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_CREDENTIALS_ID = 'NexusNPMCredentials'
+        NEXUS_AUTH_CREDENTIALS_ID = 'NexusAuthCredentials'
+
+        SONAR_HOST_URL = "http://172.31.208.1:9000"
+
         GIT_REPO_URL = 'https://github.com/buddhagubhaju5/Devops_Assignment4.git'
-        SONARQUBE_SERVER = 'SonarQube'  // Name configured for SonarQube in Jenkins
-        NEXUS_URL = 'http://localhost:8081'
-        NEXUS_REPOSITORY = 'devops_assignment4'
-        NEXUS_CREDENTIALS = 'nexus_credentials' // Nexus credentials ID in Jenkins
-        SONARQUBE_TOKEN = 'Sonarqube-Token' // SonarQube token ID in Jenkins
         GIT_CREDENTIALS = 'github-credentials' // GitHub credentials ID in Jenkins
-        APP_VERSION = '1.0.0' // Version of the application; can be set dynamically if needed
+
     }
-    
     
     stages {
         // Step 1: Checkout code from GitHub repository
@@ -28,6 +30,42 @@ pipeline {
                 echo 'Cloning GitHub repository...'
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], 
                     userRemoteConfigs: [[url: "${GIT_REPO_URL}", credentialsId: "${GIT_CREDENTIALS}"]]])
+            }
+        }
+
+        // Step 2: Install project dependencies using npm
+        stage('Install Dependencies') {
+            steps {
+                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
+                    echo 'Building...'
+                    sh "npm install --userconfig $npmrc --registry http://172.17.0.1:8081/repository/devops-exercise4-proxy/ --loglevel verbose"
+                }
+            }
+        }
+
+        // Step 3: Build the application (e.g., using npm or webpack)
+        stage('Build') {
+            steps {
+                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
+                    echo 'Building...'
+                    sh "npm run build --userconfig $npmrc --registry http://172.31.208.1:8081/repository/npm-proxy/ --loglevel verbose"
+                }
+            }
+        }
+
+        // Step 4: Run SonarQube analysis on the code for quality checks
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv() {
+                        sh """${SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://172.31.208.1:9000 \
+                        -Dsonar.token=squ_74ff488ed13a82159d6dde8f616c4d091f9341a3 \
+                        -Dsonar.exclusions=**/node_modules/** \
+                        -Dsonar.projectKey=DevOps-Exercise-4"""
+                    }
+                }
             }
         }
         
@@ -52,7 +90,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube') {
-                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://0.0.0.0:9000/ \
+                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
                         -Dsonar.token=squ_74ff488ed13a82159d6dde8f616c4d091f9341a3 \
                         -Dsonar.projectName="devassign4" \
                         -Dsonar.exclusions=**/node_modules/** \
