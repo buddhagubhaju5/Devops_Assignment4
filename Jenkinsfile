@@ -8,7 +8,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'SonarQube'
 
-        NODEJS_HOME = tool name: 'NodeJS 18.20.5'
+        NODEJS_HOME = tool name: 'nodejs'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
 
         NEXUS_VERSION = "nexus3"
