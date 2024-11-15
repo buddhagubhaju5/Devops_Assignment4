@@ -101,29 +101,13 @@ pipeline {
             }
         }
         
-        // Step 7: Package the application as a tar.gz file for deployment
-        stage('Package') {
+        // Step 7: Publish to nexus
+        stage('Publish to Nexus') {
             steps {
-                echo 'Packaging the application...'
-                sh 'tar -czf myapp-${APP_VERSION}.tar.gz -C path/to/build-directory .' // Adjust the path as needed
-            }
-        }
-        
-        // Step 8: Deploy the packaged artifact to Nexus repository
-        stage('Deploy to Nexus') {
-            steps {
-                echo 'Deploying to Nexus...'
-                nexusArtifactUploader artifacts: [[artifactId: 'myapp', 
-                                                  classifier: '', 
-                                                  file: "myapp-${APP_VERSION}.tar.gz", 
-                                                  type: 'gz']], 
-                                     credentialsId: NEXUS_CREDENTIALS, 
-                                     groupId: 'com.example', 
-                                     nexusUrl: "${NEXUS_URL}", 
-                                     nexusVersion: 'nexus3', 
-                                     protocol: 'http', 
-                                     repository: "${NEXUS_REPOSITORY}", 
-                                     version: "${APP_VERSION}"
+                withCredentials([file(credentialsId: 'NexusNPMCredentials', variable: 'npmrc')]) {
+                    echo 'Publishing to Nexus...'
+                    sh "npm publish --userconfig ${npmrc} --loglevel verbose"
+                }
             }
         }
     }
