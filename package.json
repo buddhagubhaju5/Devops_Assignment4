@@ -6,9 +6,8 @@
 	"author": "Buddha Gubhaju",
 	"license": "MIT",
 	"scripts": {
-		"build": "npx tsc",
     "start": "node app.js",    
-		"dev": "nodemon src/index.ts"
+    "build": "echo 'No build necessary for a Node/Express app'"
 	},
 	"publishConfig": {
 		"registry": "http://172.31.208.1:8081/repository/npm-hosted/"
